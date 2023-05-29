@@ -1,92 +1,401 @@
-# opb-sdk-irita
+- [opb-sdk-java](#opb-sdk-java)
+    - [引入 opb-sdk-java](#引入-opb-sdk-java)
+        - [从maven中央仓库引入 (load from central maven)](#从maven中央仓库引入-load-from-central-maven)
+        - [手动下载引入 (manual load)](#手动下载引入-manual-load)
+    - [Key Manger管理](#key-manger管理)
+        - [0 新生成一个助记词(如果已有 私钥/keystore/助记词 忽略此步骤)](#0-新生成一个助记词如果已有-私钥keystore助记词-忽略此步骤)
+        - [1 恢复私钥 (recover privKey)](#1-恢复私钥-recover-privkey)
+            - [1.1 从助记词恢复(recover from mnemonic)](#11-从助记词恢复recover-from-mnemonic)
+            - [1.2 从私钥(recover from privKey)](#12-从私钥recover-from-privkey)
+            - [1.3 从keystore恢复(recover from keystore)](#13-从keystore恢复recover-from-keystore)
+        - [2 导出(export)](#2-导出export)
+    - [怎样使用opb-sdk-java(How to use opb-sdk-java)](#怎样使用opb-sdk-javahow-to-use-opb-sdk-java)
+        - [1-1 初始化OpbClient (连接测试网 connect testnet)](#1-1-初始化opbclient-连接测试网-connect-testnet)
+        - [1-2 初始化OpbClient (连接开放联盟链 connect open alliance chain)](#1-2-初始化opbclient-连接开放联盟链-connect-open-alliance-chain)
+        - [2 构造 txBodyBz (construct txBodyBz)](#2-构造-txbodybz-construct-txbodybz)
+        - [3 构造 authInfoBz (construct authInfoBz)](#3-构造-authinfobz-construct-authinfobz)
+        - [4 签名 / 其它发送交易的方法 (sign / user other method to send tx)](#4-签名--其它发送交易的方法-sign--user-other-method-to-send-tx)
+    - [离线HASH (offline hash calculate)](#离线hash-offline-hash-calculate)
+    - [使用NFT模块(Use NftClient)](#使用nft模块use-nftclient)
+        - [1. 新增一个denom(issue denom)](#1-新增一个denomissue-denom)
+        - [2. 发行一个nft(mint nft)](#2-发行一个nftmint-nft)
+        - [3. 编辑/修改存在的nft(edit nft)](#3-编辑修改存在的nftedit-nft)
+        - [4. 销毁nft(burn nft)](#4-销毁nftburn-nft)
+        - [5. 查询denom (query denom)](#5-查询denom-query-denom)
+        - [6. 通过owner查询 (query by owner)](#6-通过owner查询-query-by-owner)
+    - [使用TIBC模块(Use TibcClient)](#使用tibc模块use-tibcclient)
+        - [1. 发起NFT跨链交易(tibc-nft-transfer transfer)](#1-发起nft跨链交易tibc-nft-transfer-transfer)
+        - [2. 查询NFT跨链交易的commitment(tibc packet packet-commitment)](#2-查询nft跨链交易的commitmenttibc-packet-packet-commitment)
+    - [使用授权模块 (Use PermClient)](#使用授权模块-use-permclient)
+        - [1. 授予某个地址权限 (Assign role to specify address)](#1-授予某个地址权限-assign-role-to-specify-address)
+        - [2. 查询地址的当前权限 (Current role of input address)](#2-查询地址的当前权限-current-role-of-input-address)
+        - [3. 删除某个地址权限 (Assign role to specify address)](#3-删除某个地址权限-assign-role-to-specify-address)
+        - [4. perm模块的其他查询和交易 (other query and tx in this module)](#4-perm模块的其他查询和交易-other-query-and-tx-in-this-module)
+    - [FeeGrant(代付)模块使用](#FeeGrant(代付)模块使用)
+        - [1. FeeGrant(代付)模块使用](#1.-设置代付的账号)
+        - [2. FeeGrant的方法说明](#2.-FeeGrant的方法说明)
+        - [3. 代付功能dem](#3.-代付功能demo)
+    - [单元测试 (Unit Test Demo)](#单元测试-unit-test-demo)
 
-原生sdk
+# opb-sdk-java
 
-## Getting started
+opb-sdk-java (open alliance chain SDK java)
 
-To make it easy for you to get started with GitLab, here's a list of recommended next steps.
+## 引入 opb-sdk-java
 
-Already a pro? Just edit this README.md and make it your own. Want to make it easy? [Use the template at the bottom](#editing-this-readme)!
+### 从maven中央仓库引入 (load from central maven)
 
-## Add your files
+https://mvnrepository.com/artifact/io.github.bianjieai
 
-- [ ] [Create](https://docs.gitlab.com/ee/user/project/repository/web_editor.html#create-a-file) or [upload](https://docs.gitlab.com/ee/user/project/repository/web_editor.html#upload-a-file) files
-- [ ] [Add files using the command line](https://docs.gitlab.com/ee/gitlab-basics/add-file.html#add-a-file-using-the-command-line) or push an existing Git repository with the following command:
+```xml
 
+<dependency>
+    <groupId>io.github.bianjieai</groupId>
+    <artifactId>opb-sdk</artifactId>
+    <version>${version}</version>
+</dependency>
 ```
-cd existing_repo
-git remote add origin http://10.0.50.12:8088/chaininfo/opb/irita-sdk/opb-sdk-irita.git
-git branch -M main
-git push -uf origin main
+
+### 手动下载引入 (manual load)
+
+从 Asset 页面下载jar包，并手动将jar包上传到私服
+
+## Key Manger管理
+
+### 0 新生成一个助记词(如果已有 私钥/keystore/助记词 忽略此步骤)
+
+```java
+        KeyManager km=KeyManagerFactory.createDefault();
+        String mnemonic=km.add();
+        System.out.println("助记词："+mnemonic);
+        System.out.println("地址："+km.getCurrentKeyInfo().getAddress());
 ```
 
-## Integrate with your tools
+### 1 恢复私钥 (recover privKey)
 
-- [ ] [Set up project integrations](http://10.0.50.12:8088/chaininfo/opb/irita-sdk/opb-sdk-irita/-/settings/integrations)
+#### 1.1 从助记词恢复(recover from mnemonic)
 
-## Collaborate with your team
+```java
+        String mnemonic="opera xxx ..."；
+        KeyManager km=KeyManagerFactory.createDefault();
+        km.recover(mnemonic);
+```
 
-- [ ] [Invite team members and collaborators](https://docs.gitlab.com/ee/user/project/members/)
-- [ ] [Create a new merge request](https://docs.gitlab.com/ee/user/project/merge_requests/creating_merge_requests.html)
-- [ ] [Automatically close issues from merge requests](https://docs.gitlab.com/ee/user/project/issues/managing_issues.html#closing-issues-automatically)
-- [ ] [Enable merge request approvals](https://docs.gitlab.com/ee/user/project/merge_requests/approvals/)
-- [ ] [Automatically merge when pipeline succeeds](https://docs.gitlab.com/ee/user/project/merge_requests/merge_when_pipeline_succeeds.html)
+#### 1.2 从私钥(recover from privKey)
 
-## Test and Deploy
+```java
+        BigInteger privKey=new BigInteger("3c49175daf981965679bf88d2690e22144424e16c84e9d397ddb58b63603eeec",16);
+        KeyManager km=KeyManagerFactory.createKeyManger(AlgoEnum.SM2);
+        km.recover(privKey);
+```
 
-Use the built-in continuous integration in GitLab.
+#### 1.3 从keystore恢复(recover from keystore)
 
-- [ ] [Get started with GitLab CI/CD](https://docs.gitlab.com/ee/ci/quick_start/index.html)
-- [ ] [Analyze your code for known vulnerabilities with Static Application Security Testing(SAST)](https://docs.gitlab.com/ee/user/application_security/sast/)
-- [ ] [Deploy to Kubernetes, Amazon EC2, or Amazon ECS using Auto Deploy](https://docs.gitlab.com/ee/topics/autodevops/requirements.html)
-- [ ] [Use pull-based deployments for improved Kubernetes management](https://docs.gitlab.com/ee/user/clusters/agent/)
-- [ ] [Set up protected environments](https://docs.gitlab.com/ee/ci/environments/protected_environments.html)
+```java
+        String keystore="-----BEGIN TENDERMINT PRIVATE KEY-----\n"+
+        "salt: 183EF9B57DEF8EF8C3AD9D21DE672E1B\n"+
+        "type: sm2\n"+
+        "kdf: bcrypt\n"+
+        "\n"+
+        "cpreEPwi0X3yIdsAIf94fR6s8L1TnDAQd/r4ifID6GmQX5a+4ehMmnTp2JjDpUe5\n"+
+        "kpgRI7CzF0DjKpPLvY9V9ZSXJFN42LHWscxqQ1E=\n"+
+        "=nJvd\n"+
+        "-----END TENDERMINT PRIVATE KEY-----";
 
-***
+        InputStream input=new ByteArrayInputStream(keystore.getBytes(StandardCharsets.UTF_8));
+        KeyManager km=KeyManagerFactory.createDefault();
+        km.recover(input,"123456");
+```
 
-# Editing this README
+### 2 导出(export)
 
-When you're ready to make this README your own, just edit this file and use the handy template below (or feel free to structure it however you want - this is just a starting point!).  Thank you to [makeareadme.com](https://www.makeareadme.com/) for this template.
+```java
+        BigInteger privKey=new BigInteger("3c49175daf981965679bf88d2690e22144424e16c84e9d397ddb58b63603eeec",16);
+        KeyManager km=KeyManagerFactory.createDefault();
+        km.recover(privKey);
 
-## Suggestions for a good README
-Every project is different, so consider which of these sections apply to yours. The sections used in the template are suggestions for most open source projects. Also keep in mind that while a README can be too long and detailed, too long is better than too short. If you think your README is too long, consider utilizing another form of documentation rather than cutting out information.
+        String keystore=km.export("123456");
+        System.out.println(keystore);
+```
 
-## Name
-Choose a self-explaining name for your project.
+## 怎样使用opb-sdk-java(How to use opb-sdk-java)
 
-## Description
-Let people know what your project can do specifically. Provide context and add a link to any reference visitors might be unfamiliar with. A list of Features or a Background subsection can also be added here. If there are alternatives to your project, this is a good place to list differentiating factors.
+### 1-1 初始化OpbClient (连接测试网 connect testnet)
 
-## Badges
-On some READMEs, you may see small images that convey metadata, such as whether or not all the tests are passing for the project. You can use Shields to add some to your README. Many services also have instructions for adding a badge.
+```java
+        String mnemonic="opera vivid pride shallow brick crew found resist decade neck expect apple chalk belt sick author know try tank detail tree impact hand best";
+        KeyManager km=KeyManagerFactory.createDefault();
+        km.recover(mnemonic);
 
-## Visuals
-Depending on what you are making, it can be a good idea to include screenshots or even a video (you'll frequently see GIFs rather than actual videos). Tools like ttygif can help, but check out Asciinema for a more sophisticated method.
+        // projectID: 填你的 projectID
+        String nodeUri="http://testnet.bianjie.ai:26657";
+        String grpcAddr="testnet.bianjie.ai:9090";
+        String chainId="testing";
+        ClientConfig clientConfig=new ClientConfig(nodeUri,grpcAddr,chainId);
+        OpbConfig opbConfig=null;
 
-## Installation
-Within a particular ecosystem, there may be a common way of installing things, such as using Yarn, NuGet, or Homebrew. However, consider the possibility that whoever is reading your README is a novice and would like more guidance. Listing specific steps helps remove ambiguity and gets people to using your project as quickly as possible. If it only runs in a specific context like a particular programming language version or operating system or has dependencies that have to be installed manually, also add a Requirements subsection.
+        OpbClient client=new OpbClient(clientConfig,opbConfig,km);
+        assertEquals("iaa1ytemz2xqq2s73ut3ys8mcd6zca2564a5lfhtm3",km.getCurrentKeyInfo().getAddress());
+```
 
-## Usage
-Use examples liberally, and show the expected output if you can. It's helpful to have inline the smallest example of usage that you can demonstrate, while providing links to more sophisticated examples if they are too long to reasonably include in the README.
+### 1-2 初始化OpbClient (连接开放联盟链 connect open alliance chain)
 
-## Support
-Tell people where they can go to for help. It can be any combination of an issue tracker, a chat room, an email address, etc.
+```java
+        String mnemonic="opera vivid pride shallow brick crew found resist decade neck expect apple chalk belt sick author know try tank detail tree impact hand best";
+        KeyManager km=KeyManagerFactory.createDefault();
+        km.recover(mnemonic);
 
-## Roadmap
-If you have ideas for releases in the future, it is a good idea to list them in the README.
+        // projectID: 填你的 projectID
+        String nodeUri="https://opbningxia.bsngate.com:18602/api/${projectID}/rpc";
+        String grpcAddr="opbningxia.bsngate.com:18603";
+        String chainId="wenchangchain";
+        ClientConfig clientConfig=new ClientConfig(nodeUri,grpcAddr,chainId);
+        OpbConfig opbConfig=new OpbConfig(${projectID},${projectKey},km.getCurrentKeyInfo().getAddress()); // 如果没有 projectKey 传null
+        // 开启 TLS 连接
+        opbConfig.setRequireTransportSecurity(true);
 
-## Contributing
-State if you are open to contributions and what your requirements are for accepting them.
+        OpbClient client=new OpbClient(clientConfig,opbConfig,km);
+        assertEquals("iaa1ytemz2xqq2s73ut3ys8mcd6zca2564a5lfhtm3",km.getCurrentKeyInfo().getAddress());
+```
 
-For people who want to make changes to your project, it's helpful to have some documentation on how to get started. Perhaps there is a script that they should run or some environment variables that they need to set. Make these steps explicit. These instructions could also be useful to your future self.
+```java
+    // tips: 连接大唐链需要修改bench32前缀
+    km.setHrp("dtc");
+```
 
-You can also document commands to lint the code or run tests. These steps help to ensure high code quality and reduce the likelihood that the changes inadvertently break something. Having instructions for running tests is especially helpful if it requires external setup, such as starting a Selenium server for testing in a browser.
+### 2 构造 txBodyBz (construct txBodyBz)
 
-## Authors and acknowledgment
-Show your appreciation to those who have contributed to the project.
+```java
+        // 该 client 类型：opbClient
+        BaseClient baseClient=client.getBaseClient();
+                TxEngine txEngine=baseClient.getTxEngine();
 
-## License
-For open source projects, say how it is licensed.
+                // 以 editNft 交易为例构造 txBody
+                Tx.MsgEditNFT msg=Tx.MsgEditNFT
+                .newBuilder()
+                .setDenomId(denomID)
+                .setId(id)
+                .setName(name)
+                .setUri(uri)
+                .setData(data)
+                .setSender(baseClient.getCurrentAddr())
+                .build();
+                List<GeneratedMessageV3> msgs=Collections.singletonList(msg);
+        TxOuterClass.TxBody txBody=txEngine.buildTxBody(msgs);
+        byte[]txBodyBz=txBody.toByteArray();
+```
 
-## Project status
-If you have run out of energy or time for your project, put a note at the top of the README saying that development has slowed down or stopped completely. Someone may choose to fork your project or volunteer to step in as a maintainer or owner, allowing your project to keep going. You can also make an explicit request for maintainers.
+### 3 构造 authInfoBz (construct authInfoBz)
+
+参见前一下小结，需要先构造 txBody (see previous of this content, construct txBody first)
+
+```java
+        TxOuterClass.TxBody txBody=txEngine.buildTxBody(msgs);
+        TxOuterClass.Tx tx=txEngine.signTx(txBody,baseTx,baseClient.queryAccount());
+        TxOuterClass.AuthInfo authInfo=tx.getAuthInfo();
+        byte[]authInfoBz=authInfo.toByteArray();
+```
+
+### 4 签名 / 其它发送交易的方法 (sign / user other method to send tx)
+
+```java
+        // 使用 txEngine 签名交易
+        TxOuterClass.Tx tx=txEngine.signTx(txBody,baseTx,baseClient.queryAccount());
+                byte[]txBz=tx.toByteArray();
+                // 使用 rpcClient 将签名好的 txBz 直接发送到区块链
+                RpcClient rpcClient=baseClient.getRpcClient();
+                ResultTx resultTx=rpcClient.broadcastTx(txBz,BroadcastMode.Commit);
+                // ---
+                // 当然也可以自己使用 httpClient 进行发送，将 txBz 进行 base64 编码，并使用 jsonRpc 发送， 代码如下
+                JsonRpc jsonRpc=JsonRpc.WrapTxBytes(txBytes,"broadcast_tx_commit");
+                String str=httpUtils.post(rpcUri,JSON.toJSONString(jsonRpc)); // rpcUri: 链uri，第二个参数post 的body
+```
+
+## 离线HASH (offline hash calculate)
+
+```java
+        String txHash=client.getBaseClient().buildTxHash(msg,baseTx,account);
+```
+
+## 使用NFT模块(Use NftClient)
+
+> 完整 Demo 示例详见: [NftDemo.java](./src/test/java/irita/sdk/NftDemo.java)
+
+### 1. 新增一个denom(issue denom)
+
+```java
+        BaseTx baseTx=new BaseTx(200000,new Fee("200000","ugas"),BroadcastMode.Commit);
+        String denomID="denomid"+new Random().nextInt(1000);
+        String denomName="test_name"+new Random().nextInt(1000);
+        String schema="no shcema";
+
+        IssueDenomRequest req=new IssueDenomRequest()
+        .setId(denomID)
+        .setName(denomName)
+        .setSchema(schema);
+        ResultTx resultTx=nftClient.issueDenom(req,baseTx);
+```
+
+### 2. 发行一个nft(mint nft)
+
+```java
+        BaseTx baseTx=new BaseTx(200000,new Fee("200000","ugas"),BroadcastMode.Commit);
+        MintNFTRequest mintReq=new MintNFTRequest()
+        .setDenom(denomID)
+        .setId(nftID)
+        .setName(nftName)
+        .setUri(uri)
+        .setData(data)
+        .setRecipient(km.getAddr());
+        ResultTx resultTx=nftClient.mintNft(mintReq,baseTx);
+```
+
+### 3. 编辑/修改存在的nft(edit nft)
+
+```java
+        BaseTx baseTx=new BaseTx(200000,new Fee("200000","ugas"),BroadcastMode.Commit);
+        String newName="new_name";
+        String newUri="http://xx.com";
+        String newData="new_data";
+        EditNFTRequest editReq=new EditNFTRequest()
+        .setDenom(denomID)
+        .setName(newName)
+        .setId(nftID)
+        .setUri(newUri)
+        .setData(newData);
+        ResultTx resultTx=nftClient.editNft(editReq,baseTx);
+```
+
+### 4. 销毁nft(burn nft)
+
+```java
+        BaseTx baseTx=new BaseTx(200000,new Fee("200000","ugas"),BroadcastMode.Commit);
+        BurnNFTRequest burnNFTReq=new BurnNFTRequest()
+        .setDenom(denomID)
+        .setId(nftID);
+        Result resultTx=nftClient.burnNft(burnNFTReq,baseTx);
+```
+
+### 5. 查询denom (query denom)
+
+```java
+        QueryDenomResp denom=nftClient.queryDenom(denomID);
+
+        // next is findAll
+        List<QueryDenomResp> denoms=nftClient.queryDenoms(null);
+```
+
+### 6. 通过owner查询 (query by owner)
+
+```java
+        QueryOwnerResp owner=nftClient.queryOwner(denomID,km.getAddr());
+```
+
+## 使用TIBC模块(Use TibcClient)
+
+### 1. 发起NFT跨链交易(tibc-nft-transfer transfer)
+
+```java
+        BaseTx baseTx=new BaseTx(200000,new Fee("300000","stake"),BroadcastMode.Commit);
+        String class_="denom01";
+        String id="nft26";
+        String destChainName="iris-test1";
+        String relayerChainName="";
+        String receiver="iaa14u80vaseg99lxej9cvlmfz96xe8mvv6p6g469p";
+        ResultTx resultTx=tibcClient.nftTransfer(class_,id,receiver,destChainName,relayerChainName,baseTx);
+```
+
+### 2. 查询NFT跨链交易的commitment(tibc packet packet-commitment)
+
+```java
+        BaseTx baseTx=new BaseTx(200000,new Fee("300000","stake"),BroadcastMode.Commit);
+        String destChain="iris-test1";
+        String sourceChain="iris-test2";
+        long sequence=2;
+        QueryOuterClass.QueryPacketCommitmentResponse commitment=tibcClient.packetCommitment(destChain,sourceChain,sequence);
+```
+
+## 使用授权模块 (Use PermClient)
+
+### 1. 授予某个地址权限 (Assign role to specify address)
+
+```java
+        Perm.Role role=Perm.Role.BLACKLIST_ADMIN;
+        ResultTx resultTx=permClient.assignRoles(acc,Collections.singletonList(role),baseTx);
+        assertNotNull(resultTx.getResult().getHash());
+```
+
+### 2. 查询地址的当前权限 (Current role of input address)
+
+```java
+        List<Perm.Role>roles=permClient.queryRoles(acc);
+```
+
+### 3. 删除某个地址权限 (Assign role to specify address)
+
+```java
+        permClient.unAssignRoles(acc,Collections.singletonList(role),baseTx);
+```
+
+### 4. perm模块的其他查询和交易 (other query and tx in this module)
+
+查看 permClient 下的方法 (see method in perClient.java)
+
+## FeeGrant(代付)模块使用
+
+### 1. 设置代付的账号
+
+```java
+        BaseTx baseTx=new BaseTx(200000,new Fee("300000","ugas"),BroadcastMode.Commit);
+        baseTx.setFeeGranter("FeeGranter 地址");
+```
+
+### 2. FeeGrant的方法说明
+
+```text
+GrantAllowance(String granter, String grantee, BaseTx baseTx)：授予全部额度
+GrantAllowance(String granter, String grantee, String denom, String amount, Timestamp timestamp, BaseTx baseTx) ：授予指定额度
+RevokeAllowance(String granter, String grantee, BaseTx baseTx) ：撤销授权
+```
+
+### 3. 代付功能demo
+
+详见 FeeGrantTest.java
+按@Order(1,2,3)依次运行
+
+## 单元测试 (Unit Test Demo)
+
+[ServiceDemoTest.java](./src/test/java/irita/sdk/ServiceDemoTest.java)
+
+[MsgsDemoTest.java](./src/test/java/irita/sdk/MsgsDemoTest.java)
+
+[NftDemoTest.java](./src/test/java/irita/sdk/NftDemoTest.java)
+
+[ClientTest.java](./src/test/java/irita/sdk/ClientTest.java)
+
+[ComGovContractTest.java](./src/test/java/irita/sdk/ComGovContractTest.java)
+
+[HttpUtilsTest.java](./src/test/java/irita/sdk/HttpUtilsTest.java)
+
+[IdentityClientTest.java](./src/test/java/irita/sdk/IdentityClientTest.java)
+
+[IOUtilTest.java](./src/test/java/irita/sdk/IOUtilTest.java)
+
+[Secp256k1KeyManagerTest.java](./src/test/java/irita/sdk/Secp256k1KeyManagerTest.java)
+
+[Sm2KeyManagerTest.java](./src/test/java/irita/sdk/Sm2KeyManagerTest.java)
+
+[MsgsTest.java](./src/test/java/irita/sdk/MsgsTest.java)
+
+[NftTest.java](./src/test/java/irita/sdk/NftTest.java)
+
+[PermTest.java](./src/test/java/irita/sdk/PermTest.java)
+
+[RecordTest.java](./src/test/java/irita/sdk/RecordTest.java)
+
+[TibcTest.java](./src/test/java/irita/sdk/TibcTest.java)
+
+[WasmTest.java](./src/test/java/irita/sdk/WasmTest.java)
+
+[FeeGrantTest.java](./src/test/java/irita/sdk/FeeGrantTest.java)
+
