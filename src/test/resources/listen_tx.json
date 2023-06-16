@@ -264,7 +264,7 @@
         "iaa1wnrllnlwm67jvqs963x8dhvqz4kdaaswmawrqy"
       ],
       "transfer.amount": [
-        "200000uirita",
+        "200000ugas",
         ""
       ],
       "respond_service.service_name": [
@@ -302,11 +302,11 @@
         "Tx"
       ],
       "coin_spent.amount": [
-        "200000uirita",
+        "200000ugas",
         ""
       ],
       "coin_received.amount": [
-        "200000uirita",
+        "200000ugas",
         ""
       ],
       "transfer.recipient": [
@@ -314,7 +314,7 @@
         "iaa1k83ewmsh9t5ra60urmcj5jc8ev2agmfez0jawf"
       ],
       "tx.fee": [
-        "200000uirita"
+        "200000ugas"
       ],
       "tx.hash": [
         "0950FAB51F3CDC01A003FB3C53DD8F8658120D8A4FDE995BFA52075EB55EAC1F"

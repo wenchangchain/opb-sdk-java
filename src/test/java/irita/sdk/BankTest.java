@@ -15,11 +15,10 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class BankTest extends ConfigTest {
 	private BankClient bankClient;
-	private final BaseTx baseTx = new BaseTx(200000, new Fee("300000", "uirita"), BroadcastMode.Commit);
+	private final BaseTx baseTx = new BaseTx(200000, new Fee("300000", "ugas"), BroadcastMode.Commit);
 
 	@BeforeEach
 	public void init() {
@@ -29,18 +28,16 @@ public class BankTest extends ConfigTest {
 
 	@Test
 	@Disabled
-	public void send() throws Exception {
+	public void queryAccount() throws Exception {
 		KeyManager termKm = KeyManagerFactory.createDefault();
 		termKm.add();
 		String addr = termKm.getCurrentKeyInfo().getAddress();
 
-		ResultTx resultTx = bankClient.send("10", "uirita", addr, baseTx);
-		assertNotNull(resultTx.getResult().getHash());
 		BaseAccount account = bankClient.queryAccount(addr);
 		List<Coin> coins = account.getCoins();
-		Optional<Coin> iritaCoin = coins.stream().filter(x -> x.getDenom().equals("uirita")).findFirst();
+		Optional<Coin> iritaCoin = coins.stream().filter(x -> x.getDenom().equals("ugas")).findFirst();
 		if (!iritaCoin.isPresent()) {
-			throw new IritaSDKException("uirita not found from list");
+			throw new IritaSDKException("ugas not found from list");
 		}
 
 		assertEquals(iritaCoin.get().getAmount(), "10");

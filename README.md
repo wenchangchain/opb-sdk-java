@@ -26,11 +26,6 @@
     - [使用TIBC模块(Use TibcClient)](#使用tibc模块use-tibcclient)
         - [1. 发起NFT跨链交易(tibc-nft-transfer transfer)](#1-发起nft跨链交易tibc-nft-transfer-transfer)
         - [2. 查询NFT跨链交易的commitment(tibc packet packet-commitment)](#2-查询nft跨链交易的commitmenttibc-packet-packet-commitment)
-    - [使用授权模块 (Use PermClient)](#使用授权模块-use-permclient)
-        - [1. 授予某个地址权限 (Assign role to specify address)](#1-授予某个地址权限-assign-role-to-specify-address)
-        - [2. 查询地址的当前权限 (Current role of input address)](#2-查询地址的当前权限-current-role-of-input-address)
-        - [3. 删除某个地址权限 (Assign role to specify address)](#3-删除某个地址权限-assign-role-to-specify-address)
-        - [4. perm模块的其他查询和交易 (other query and tx in this module)](#4-perm模块的其他查询和交易-other-query-and-tx-in-this-module)
     - [FeeGrant(代付)模块使用](#FeeGrant(代付)模块使用)
         - [1. FeeGrant(代付)模块使用](#1.-设置代付的账号)
         - [2. FeeGrant的方法说明](#2.-FeeGrant的方法说明)
@@ -319,32 +314,6 @@ https://mvnrepository.com/artifact/io.github.bianjieai
         QueryOuterClass.QueryPacketCommitmentResponse commitment=tibcClient.packetCommitment(destChain,sourceChain,sequence);
 ```
 
-## 使用授权模块 (Use PermClient)
-
-### 1. 授予某个地址权限 (Assign role to specify address)
-
-```java
-        Perm.Role role=Perm.Role.BLACKLIST_ADMIN;
-        ResultTx resultTx=permClient.assignRoles(acc,Collections.singletonList(role),baseTx);
-        assertNotNull(resultTx.getResult().getHash());
-```
-
-### 2. 查询地址的当前权限 (Current role of input address)
-
-```java
-        List<Perm.Role>roles=permClient.queryRoles(acc);
-```
-
-### 3. 删除某个地址权限 (Assign role to specify address)
-
-```java
-        permClient.unAssignRoles(acc,Collections.singletonList(role),baseTx);
-```
-
-### 4. perm模块的其他查询和交易 (other query and tx in this module)
-
-查看 permClient 下的方法 (see method in perClient.java)
-
 ## FeeGrant(代付)模块使用
 
 ### 1. 设置代付的账号
@@ -392,8 +361,6 @@ RevokeAllowance(String granter, String grantee, BaseTx baseTx) ：撤销授权
 [MsgsTest.java](./src/test/java/irita/sdk/MsgsTest.java)
 
 [NftTest.java](./src/test/java/irita/sdk/NftTest.java)
-
-[PermTest.java](./src/test/java/irita/sdk/PermTest.java)
 
 [RecordTest.java](./src/test/java/irita/sdk/RecordTest.java)
 
