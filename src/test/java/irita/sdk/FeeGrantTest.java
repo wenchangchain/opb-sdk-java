@@ -8,7 +8,7 @@ import irita.sdk.key.AlgoEnum;
 import irita.sdk.key.KeyManager;
 import irita.sdk.key.KeyManagerFactory;
 import irita.sdk.model.*;
-import irita.sdk.module.bank.BankClient;
+import irita.sdk.module.account.AccountClient;
 import irita.sdk.module.feegrant.FeeGrantClient;
 import irita.sdk.module.nft.MintNFTRequest;
 import irita.sdk.module.nft.NftClient;
@@ -107,8 +107,8 @@ public class FeeGrantTest extends ConfigTest {
 
 
     private String testQueryAccount(String address, String tokenDenom) {
-        BankClient bankClient = iritaClient.getBankClient();
-        BaseAccount account = bankClient.queryAccount(address);
+        AccountClient accountClient = iritaClient.getAccountClient();
+        BaseAccount account = accountClient.queryAccount(address);
         List<Coin> coins = account.getCoins();
         Optional<Coin> iritaCoin = coins.stream().filter(x -> x.getDenom().equals(tokenDenom)).findFirst();
         return iritaCoin.isPresent() ? iritaCoin.get().getAmount() : "0";

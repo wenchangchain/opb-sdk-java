@@ -6,7 +6,7 @@ import irita.sdk.exception.IritaSDKException;
 import irita.sdk.key.KeyManager;
 import irita.sdk.key.KeyManagerFactory;
 import irita.sdk.model.*;
-import irita.sdk.module.bank.BankClient;
+import irita.sdk.module.account.AccountClient;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -16,14 +16,14 @@ import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class BankTest extends ConfigTest {
-	private BankClient bankClient;
+public class AccountTest extends ConfigTest {
+	private AccountClient accountClient;
 	private final BaseTx baseTx = new BaseTx(200000, new Fee("300000", "ugas"), BroadcastMode.Commit);
 
 	@BeforeEach
 	public void init() {
 		IritaClient client = getTestClient();
-		bankClient = client.getBankClient();
+		accountClient = client.getAccountClient();
 	}
 
 	@Test
@@ -33,7 +33,7 @@ public class BankTest extends ConfigTest {
 		termKm.add();
 		String addr = termKm.getCurrentKeyInfo().getAddress();
 
-		BaseAccount account = bankClient.queryAccount(addr);
+		BaseAccount account = accountClient.queryAccount(addr);
 		List<Coin> coins = account.getCoins();
 		Optional<Coin> iritaCoin = coins.stream().filter(x -> x.getDenom().equals("ugas")).findFirst();
 		if (!iritaCoin.isPresent()) {

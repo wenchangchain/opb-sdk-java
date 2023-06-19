@@ -3,7 +3,7 @@ package irita.sdk.client;
 import irita.sdk.config.ClientConfig;
 import irita.sdk.config.OpbConfig;
 import irita.sdk.key.KeyManager;
-import irita.sdk.module.bank.BankClient;
+import irita.sdk.module.account.AccountClient;
 import irita.sdk.module.community_gov.CommunityGovClient;
 import irita.sdk.module.feegrant.FeeGrantClient;
 import irita.sdk.module.identity.IdentityClient;
@@ -17,7 +17,7 @@ import irita.sdk.module.wasm.WasmClient;
 public class IritaClient {
     private BaseClient baseClient;
     private NftClient nftClient;
-    private BankClient bankClient;
+    private AccountClient accountClient;
     private TibcClient tibcClient;
     private IdentityClient identityClient;
     private RecordClient recordClient;
@@ -34,7 +34,7 @@ public class IritaClient {
         BaseClient baseClient = new BaseClient(clientConfig, opbConfig, km);
         this.baseClient = baseClient;
         this.nftClient = new NftClient(baseClient);
-        this.bankClient = new BankClient(baseClient);
+        this.accountClient = new AccountClient(baseClient);
         this.tibcClient = new TibcClient(baseClient);
         this.identityClient = new IdentityClient(baseClient);
         this.recordClient = new RecordClient(baseClient);
@@ -63,12 +63,12 @@ public class IritaClient {
         return this;
     }
 
-    public BankClient getBankClient() {
-        return bankClient;
+    public AccountClient getAccountClient() {
+        return accountClient;
     }
 
-    public IritaClient setBankClient(BankClient bankClient) {
-        this.bankClient = bankClient;
+    public IritaClient setAccountClient(AccountClient accountClient) {
+        this.accountClient = accountClient;
         return this;
     }
 

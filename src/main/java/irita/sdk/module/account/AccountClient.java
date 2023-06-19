@@ -1,7 +1,5 @@
-package irita.sdk.module.bank;
+package irita.sdk.module.account;
 
-import com.google.protobuf.GeneratedMessageV3;
-import io.grpc.Channel;
 import io.grpc.ManagedChannel;
 import irita.sdk.client.BaseClient;
 import irita.sdk.model.*;
@@ -11,10 +9,10 @@ import proto.cosmos.bank.v1beta1.QueryOuterClass;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class BankClient {
+public class AccountClient {
     private final BaseClient baseClient;
 
-    public BankClient(BaseClient baseClient) {
+    public AccountClient(BaseClient baseClient) {
         this.baseClient = baseClient;
     }
 

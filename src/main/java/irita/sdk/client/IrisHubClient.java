@@ -2,7 +2,7 @@ package irita.sdk.client;
 
 import irita.sdk.config.ClientConfig;
 import irita.sdk.key.KeyManager;
-import irita.sdk.module.bank.BankClient;
+import irita.sdk.module.account.AccountClient;
 import irita.sdk.module.identity.IdentityClient;
 import irita.sdk.module.nft.NftClient;
 import irita.sdk.module.record.RecordClient;
@@ -12,7 +12,7 @@ import irita.sdk.module.wasm.WasmClient;
 public class IrisHubClient {
     private BaseClient baseClient;
     private NftClient nftClient;
-    private BankClient bankClient;
+    private AccountClient accountClient;
     private TibcClient tibcClient;
     private IdentityClient identityClient;
     private RecordClient recordClient;
@@ -25,7 +25,7 @@ public class IrisHubClient {
         BaseClient baseClient = new BaseClient(clientConfig, null, km);
         this.baseClient = baseClient;
         this.nftClient = new NftClient(baseClient);
-        this.bankClient = new BankClient(baseClient);
+        this.accountClient = new AccountClient(baseClient);
         this.tibcClient = new TibcClient(baseClient);
         this.identityClient = new IdentityClient(baseClient);
         this.recordClient = new RecordClient(baseClient);
@@ -50,12 +50,12 @@ public class IrisHubClient {
         return this;
     }
 
-    public BankClient getBankClient() {
-        return bankClient;
+    public AccountClient getAccountClient() {
+        return accountClient;
     }
 
-    public IrisHubClient setBankClient(BankClient bankClient) {
-        this.bankClient = bankClient;
+    public IrisHubClient setAccountClient(AccountClient accountClient) {
+        this.accountClient = accountClient;
         return this;
     }
 
